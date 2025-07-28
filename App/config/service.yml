@@ -1,0 +1,12 @@
+core:
+  - App\Core\DataBase
+  - App\Core\Session
+  - App\Core\Validator
+
+services:
+  - App\Services\DatabaseProvider
+
+repositories:
+  - App\Repositories\AchatRepository
+  - App\Repositories\CompteurRepository
+  - App\Repositories\TrancheRepository

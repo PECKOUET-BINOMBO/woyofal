@@ -1,0 +1,54 @@
+{
+    "name": "appwoyofal/app",
+    "description": "A PHP web application",
+    "type": "project",
+    "keywords": [
+        "php",
+        "web",
+        "application",
+        "woyofal",
+        "compteur",
+        "électricité"
+    ],
+    "autoload": {
+        "psr-4": {
+           
+            "App\\Core\\": "App/core",
+            "App\\Controllers\\": "src/controllers",
+            "App\\Entities\\": "src/entities",
+            "App\\Repositories\\": "src/repositories",
+            "App\\Services\\": "src/services",
+            "App\\Core\\Abstract\\": "App/core/abstract",
+            "App\\Core\\Middlewares\\": "App/core/middlewares",
+            "App\\Core\\Interfaces\\": "App/core/Interface",
+            "App\\Database\\Migration\\": "database/migrations",
+            "App\\Database\\Seeders\\": "database/seeders",
+            "App\\Src\\Enums\\": "src/enums",
+            "App\\Migrations\\": "App/migrations"
+
+
+        }
+    },
+    "authors": [
+        {
+            "name": "Paul",
+            "email": "apeckouet@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "symfony/yaml": "^5.0",
+        "vlucas/phpdotenv": "^5.6",
+        "mrsems/router-php": "^1.0"
+
+
+        
+       
+    },
+    "minimum-stability": "stable",
+    "scripts": {
+        "serve": "php -S localhost:8000 -t public",
+        "database:migrate": "@php bin/migrate",
+        "database:seed": "@php bin/seed"
+    }
+}

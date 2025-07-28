@@ -1,0 +1,8 @@
+<?php
+#!/usr/bin/env php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Database\Seeders\Seeder;
+
+new Seeder(); // Ou (new Seeder())->run(); selon ton implémentation

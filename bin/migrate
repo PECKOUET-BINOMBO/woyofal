@@ -1,0 +1,9 @@
+<?php
+#!/usr/bin/env php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Database\Migration\Migration;
+
+new Migration(); // Lancement automatique dans le constructeur ou
+// (new Migration())->run(); // Si tu veux contrôler explicitement

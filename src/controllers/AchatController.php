@@ -11,11 +11,23 @@ class AchatController {
         $this->achatService = $achatService;
     }
 
-    public function acheter(array $requestData): void {
-        $response = $this->achatService->effectuerAchat(
-            $requestData['compteur'],
-            $requestData['montant']
-        );
-        ResponseFormatter::json($response);
+   public function acheter(): void {
+    // Récupération des données JSON
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    if (!isset($data['compteur'], $data['montant'])) {
+        ResponseFormatter::json(ResponseFormatter::error('Données manquantes', 400));
+        return;
     }
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    $response = $this->achatService->effectuerAchat(
+        $data['compteur'],
+        (float)$data['montant'],
+        $ip
+    );
+
+    ResponseFormatter::json($response);
+}
 }

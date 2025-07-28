@@ -2,28 +2,37 @@
 namespace App\Services;
 
 use App\Entities\Achat;
-use App\Repositories\{AchatRepository, CompteurRepository, TrancheRepository};
+use App\Repositories\{AchatRepository, CompteurRepository, TrancheRepository, JournalAchatRepository};
 use App\Core\ResponseFormatter;
 use App\Src\Enums\ErrorEnum;
 use App\Src\Enums\SuccessEnum;
+use App\Repositories\ClientRepository;
+
 
 class AchatService {
     private AchatRepository $achatRepo;
     private CompteurRepository $compteurRepo;
     private TrancheRepository $trancheRepo;
+    private JournalAchatRepository $journalAchatRepo;
+    private ClientRepository $clientRepo;
 
     public function __construct(
         AchatRepository $achatRepo,
         CompteurRepository $compteurRepo,
-        TrancheRepository $trancheRepo
+        TrancheRepository $trancheRepo,
+        JournalAchatRepository $journalAchatRepo,
+        ClientRepository $clientRepo
     ) {
         $this->achatRepo = $achatRepo;
         $this->compteurRepo = $compteurRepo;
         $this->trancheRepo = $trancheRepo;
+        $this->journalAchatRepo = $journalAchatRepo;
+        $this->clientRepo = $clientRepo;
     }
 
-    public function effectuerAchat(string $compteurNumero, float $montant): array {
-        if (!$this->compteurRepo->findByNumero($compteurNumero)) {
+    public function effectuerAchat(string $compteurNumero, float $montant, ?string $ip = null): array {
+        $compteur = $this->compteurRepo->findByNumero($compteurNumero);
+        if (!$compteur) {
             return ResponseFormatter::error(ErrorEnum::COMPTEUR_NOT_FOUND->value, 404);
         }
 
@@ -31,24 +40,45 @@ class AchatService {
         if (!$tranche) {
             return ResponseFormatter::error(ErrorEnum::NO_TRANCHE_FOUND->value, 400);
         }
+
         $nbreKwh = $montant / $tranche->getPrixUnitaire();
+        $reference = $this->generateReference();
+        $codeRecharge = $this->generateCodeRecharge();
+        $dateAchat = date('Y-m-d H:i:s');
 
         $achat = new Achat(
-            $this->generateReference(),
+            $reference,
             $compteurNumero,
             $montant,
             $nbreKwh,
             $tranche->getId(),
-            $this->generateCodeRecharge()
+            $codeRecharge
         );
         $this->achatRepo->save($achat);
 
+        // Journalisation de l'achat
+        if ($ip) {
+            $this->journalAchatRepo->log($achat, $ip);
+        }
+
+        $clientNomPrenom = '';
+        if ($compteur) {
+            $client = $this->clientRepo->findById($compteur->getClientId());
+            if ($client) {
+                $clientNomPrenom = $client->nom . ' ' . $client->prenom;
+            }
+        }
+
         return ResponseFormatter::success([
-            'reference' => $achat->getReference(),
-            'code' => $achat->getCodeRecharge(),
-            'nbreKwh' => $nbreKwh,
-            'tranche' => $tranche->getNom()
-        ], SuccessEnum::SUCCESS->value);
+            'compteur' => $compteurNumero,
+            'reference' => $reference,
+            'code' => $codeRecharge,
+            'date' => $dateAchat,
+            'tranche' => $tranche->getNom(),
+            'prix' => $tranche->getPrixUnitaire(),
+            'nbreKwt' => $nbreKwh,
+            'client' => $clientNomPrenom
+        ], "Achat effectué avec succès");
     }
 
     private function generateReference(): string {

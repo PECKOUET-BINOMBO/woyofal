@@ -141,6 +141,20 @@ class Migration
         echo "Table 'achats' créée.\n";
     }
 
+    private function createJournalAchat(PDO $pdo):void
+    {
+        $sql = "
+            CREATE TABLE IF NOT EXISTS journal_achats (
+    id SERIAL PRIMARY KEY,
+    achat_id INTEGER REFERENCES achats(id),
+    ip VARCHAR(45) NOT NULL,
+    statut VARCHAR(20) NOT NULL CHECK (statut IN ('success', 'error')),
+    date_operation TIMESTAMP NOT NULL
+);
+        ";
+        $pdo->exec($sql);
+    }
+
     private function seedInitialData(PDO $pdo): void
     {
         // Vérifie si les tranches existent déjà

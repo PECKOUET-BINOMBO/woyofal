@@ -20,5 +20,6 @@ class CompteurController {
                 ? ResponseFormatter::success(['exists' => true])
                 : ResponseFormatter::error(ErrorEnum::COMPTEUR_NOT_FOUND->value, 404)
         );
+        
     }
 }

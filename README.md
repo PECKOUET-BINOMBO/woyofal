@@ -22,7 +22,7 @@ Elle permet la gestion des clients, compteurs, achats de crédit, tranches tarif
 
 1. **Cloner le projet**  
    ```bash
-   git clone <votre-url-git>
+   git clone https://github.com/PECKOUET-BINOMBO/woyofal.git
    cd AppWoyofal
    ```
 
